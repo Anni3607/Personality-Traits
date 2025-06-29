@@ -64,18 +64,42 @@ color_map = {
     "Chandler Bing": {"bg": "#E8F8F5", "text": "black"}
 }
 
-# --- Image Handling: Using Direct GitHub URLs (NOT Base64) ---
-# Base URL for the raw images on GitHub
-# IMPORTANT: Double-check your GitHub username, repository name, and branch name here!
-GITHUB_IMAGES_BASE_URL = "[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/)"
+# --- IMAGE HANDLING SECTION ---
+# CHOOSE ONE of the two options below based on where you host your images:
+#
+# OPTION 1: If using Imgur, Cloudinary, etc., where each image has a unique URL:
+IMAGE_URLS = {
+    "Walter White": "[https://placehold.co/300x300/F4D03F/black?text=Walter+White](https://placehold.co/300x300/F4D03F/black?text=Walter+White)", # Replace with actual Imgur/Cloudinary URL
+    "Michael Scott": "[https://placehold.co/300x300/D6EAF8/black?text=Michael+Scott](https://placehold.co/300x300/D6EAF8/black?text=Michael+Scott)",
+    "Nezuko": "[https://placehold.co/300x300/F9EBEA/black?text=Nezuko](https://placehold.co/300x300/F9EBEA/black?text=Nezuko)",
+    "Sheldon Cooper": "[https://placehold.co/300x300/E8DAEF/black?text=Sheldon+Cooper](https://placehold.co/300x300/E8DAEF/black?text=Sheldon+Cooper)", # YOUR NEW URL HERE
+    "Johan Liebert": "[https://placehold.co/300x300/FADBD8/black?text=Johan+Liebert](https://placehold.co/300x300/FADBD8/black?text=Johan+Liebert)",
+    "Moira Rose": "[https://placehold.co/300x300/FCF3CF/black?text=Moira+Rose](https://placehold.co/300x300/FCF3CF/black?text=Moira+Rose)",
+    "Phil Dunphy": "[https://placehold.co/300x300/D1F2EB/black?text=Phil+Dunphy](https://placehold.co/300x300/D1F2EB/black?text=Phil+Dunphy)",
+    "Cameron Tucker": "[https://placehold.co/300x300/FADBD8/black?text=Cameron+Tucker](https://placehold.co/300x300/FADBD8/black?text=Cameron+Tucker)",
+    "Ron Swanson": "[https://placehold.co/300x300/FDEDEC/black?text=Ron+Swanson](https://placehold.co/300x300/FDEDEC/black?text=Ron+Swanson)",
+    "Sherlock Holmes": "[https://placehold.co/300x300/EAECEE/black?text=Sherlock+Holmes](https://placehold.co/300x300/EAECEE/black?text=Sherlock+Holmes)",
+    "Batman": "[https://placehold.co/300x300/D5DBDB/black?text=Batman](https://placehold.co/300x300/D5DBDB/black?text=Batman)",
+    "Peter Griffin": "[https://placehold.co/300x300/F6DDCC/black?text=Peter+Griffin](https://placehold.co/300x300/F6DDCC/black?text=Peter+Griffin)",
+    "Daenerys": "[https://placehold.co/300x300/EBDEF0/black?text=Daenerys](https://placehold.co/300x300/EBDEF0/black?text=Daenerys)",
+    "Andy Dwyer": "[https://placehold.co/300x300/FEF9E7/black?text=Andy+Dwyer](https://placehold.co/300x300/FEF9E7/black?text=Andy+Dwyer)",
+    "Jethalal Gada": "[https://placehold.co/300x300/FCF3CF/black?text=Jethalal+Gada](https://placehold.co/300x300/FCF3CF/black?text=Jethalal+Gada)",
+    "Chandler Bing": "[https://placehold.co/300x300/E8F8F5/black?text=Chandler+Bing](https://placehold.co/300x300/E8F8F5/black?text=Chandler+Bing)",
+}
 
-# Function to generate the correct raw GitHub image URL
-# It expects image files to be lowercase with underscores and .png extension.
 def get_image_url(character):
-    image_filename = f"{character.replace(' ', '_').lower()}.png"
-    return GITHUB_IMAGES_BASE_URL + image_filename
+    return IMAGE_URLS.get(character, "[https://placehold.co/300x300/cccccc/ffffff?text=Image+URL+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+URL+Missing)")
 
-# --- End of Image Handling Section ---
+# OR
+#
+# OPTION 2: If you set up GitHub Pages for your repository:
+# GITHUB_PAGES_BASE_URL = "[https://annni3607.github.io/Personality-Traits/images/](https://annni3607.github.io/Personality-Traits/images/)"
+#
+# def get_image_url(character):
+#     image_filename = f"{character.replace(' ', '_').lower()}.png"
+#     return GITHUB_PAGES_BASE_URL + image_filename
+#
+# --- END OF IMAGE HANDLING SECTION ---
 
 
 questions = [
