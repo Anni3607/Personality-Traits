@@ -108,7 +108,7 @@ questions_and_choices = [
         "options": ["Very intensely", "Moderately", "Calmly"]
     },
     {
-        "question": "⚖️ On a scale of 1 to 3, how much do you value logic over emotions in life?",
+        "question": "⚖ On a scale of 1 to 3, how much do you value logic over emotions in life?",
         "options": ["Highly value logic", "Balanced", "Highly value emotions"]
     },
     {
@@ -120,11 +120,11 @@ questions_and_choices = [
         "options": ["Very stylish", "Moderately stylish", "Practical and simple"]
     },
     {
-        "question": "🛠️ On a scale of 1 to 3, how much do you prefer hands-on, practical work over theoretical?",
+        "question": "🛠 On a scale of 1 to 3, how much do you prefer hands-on, practical work over theoretical?",
         "options": ["Strongly prefer hands-on", "Balanced", "Strongly prefer theoretical"]
     },
     {
-        "question": "🗣️ On a scale of 1 to 3, how much do people find you socially funny or talkative?",
+        "question": "🗣 On a scale of 1 to 3, how much do people find you socially funny or talkative?",
         "options": ["Very funny/talkative", "Moderately", "Quiet/reserved"]
     },
     {
@@ -136,7 +136,7 @@ questions_and_choices = [
         "options": ["Highly admire", "Moderately", "Less of a priority"]
     },
     {
-        "question": "✈️ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?",
+        "question": "✈ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?",
         "options": ["Peaceful, scenic", "Balanced", "Luxurious"]
     }
 ]
@@ -152,7 +152,7 @@ st.write("Be honest :)")
 
 answers = []
 for idx, q_data in enumerate(questions_and_choices):
-    answer = st.selectbox(f"**{q_data['question']}**", q_data['options'], key=idx)
+    answer = st.selectbox(f"{q_data['question']}", q_data['options'], key=idx)
     answers.append(q_data['options'].index(answer) + 1)
 
 if st.button("✨ Reveal Your Character"):
@@ -170,7 +170,7 @@ if st.button("✨ Reveal Your Character"):
         colors = color_map.get(character, {"bg": DEFAULT_BACKGROUND_COLOR, "text": DEFAULT_TEXT_COLOR})
         set_background_color(colors["bg"], colors["text"])
         
-        st.subheader(f"🎉 You are most like **{character}**!")
+        st.subheader(f"🎉 You are most like *{character}*!")
 
         image_url = get_image_url(character)
         
@@ -190,4 +190,5 @@ if st.button("✨ Reveal Your Character"):
             """,
             unsafe_allow_html=True
         )
+
 
