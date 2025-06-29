@@ -45,21 +45,21 @@ def get_image_path(character):
     return f"https://github.com/Anni3607/Personality-Traits/tree/main/images{character.replace(' ', '_').lower()}.jpg"
 
 questions = [
-    "How do you handle pressure?",
-    "What's your idea of fun?",
-    "How do you usually make decisions?",
-    "What's your biggest fear?",
-    "What describes your personality best?",
-    "What's your role in a group?",
-    "If betrayed, you would...",
-    "What's more important to you?",
-    "Which pet would you choose?",
-    "Your dressing style is?",
-    "You prefer work that is...",
-    "People often describe you as...",
-    "When someone hurts you, you...",
-    "What do you value most in others?",
-    "What’s your dream vacation?"
+    "🧠 On a scale of 1 to 3, how calm are you under pressure?",
+    "🎉 On a scale of 1 to 3, how much do you enjoy wild, energetic fun over quiet time?",
+    "🤔 On a scale of 1 to 3, how impulsive are your decisions?",
+    "😨 On a scale of 1 to 3, how strongly do you fear losing control or power?",
+    "🪞 On a scale of 1 to 3, how emotional and expressive are you?",
+    "🧑‍🤝‍🧑 On a scale of 1 to 3, how much of a leader are you in group settings?",
+    "🔪 On a scale of 1 to 3, how intensely do you react to betrayal?.",
+    "⚖️ On a scale of 1 to 3, how much do you value logic over emotions in life?",
+    "🐶 On a scale of 1 to 3, how affectionate and attached are you to animals or pets?",
+    "👗 On a scale of 1 to 3, how stylish and expressive is your dressing style?",
+    "🛠️ On a scale of 1 to 3, how much do you prefer hands-on, practical work over theoretical?",
+    "🗣️ On a scale of 1 to 3, how much do people find you socially funny or talkative?",
+    "💔 On a scale of 1 to 3, how deeply do you hold grudges when someone hurts you?.",
+    "🫶 On a scale of 1 to 3, how much do you admire honesty and kindness in others?",
+    "✈️ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?"
 ]
 
 options = ["1", "2", "3"]
