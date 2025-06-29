@@ -77,14 +77,13 @@ color_map = {
 }
 
 # Function to generate the correct raw GitHub image URL
-# This is crucial for images hosted on GitHub to display correctly in deployed apps.
+# --- CRITICAL FIX: Changed .jpg to .png based on your screenshot ---
 def get_image_url(character):
     # Ensure the character name matches the image file naming convention.
-    # e.g., "Walter White" -> "walter_white.jpg"
-    image_filename = f"{character.replace(' ', '_').lower()}.jpg"
+    # e.g., "Walter White" -> "walter_white.png"
+    image_filename = f"{character.replace(' ', '_').lower()}.png" # <--- CHANGED HERE FROM .jpg TO .png
     # IMPORTANT: Verify 'Anni3607', 'Personality-Traits', and 'main'
     # match your exact GitHub username, repository name, and branch name.
-    # Also, ensure images are indeed .jpg. If you have .png, modify this.
     return f"[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/){image_filename}"
 
 # Define the questions for the personality quiz
