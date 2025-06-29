@@ -77,13 +77,10 @@ color_map = {
 }
 
 # Function to generate the correct raw GitHub image URL
-# --- CRITICAL FIX: Changed .jpg to .png based on your screenshot ---
+# It expects image files to be lowercase with underscores and .png extension.
 def get_image_url(character):
-    # Ensure the character name matches the image file naming convention.
-    # e.g., "Walter White" -> "walter_white.png"
-    image_filename = f"{character.replace(' ', '_').lower()}.png" # <--- CHANGED HERE FROM .jpg TO .png
-    # IMPORTANT: Verify 'Anni3607', 'Personality-Traits', and 'main'
-    # match your exact GitHub username, repository name, and branch name.
+    image_filename = f"{character.replace(' ', '_').lower()}.png"
+    # Double-check this path on your GitHub repo (username, repo, branch, folder name)
     return f"[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/){image_filename}"
 
 # Define the questions for the personality quiz
@@ -105,7 +102,7 @@ questions = [
     "✈️ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?"
 ]
 
-# Options for the selectbox inputs (remains "1", "2", "3")
+# Options for the selectbox inputs
 options = ["1", "2", "3"]
 
 # --- Streamlit UI Layout ---
@@ -120,44 +117,35 @@ st.write("Be honest :)")
 
 answers = []
 for idx, question in enumerate(questions):
-    # Display each question using st.selectbox for user input
     answer = st.selectbox(f"**{question}**", options, key=idx)
-    answers.append(int(answer)) # Convert selected option to integer
+    answers.append(int(answer))
 
 # Button to trigger the character prediction
 if st.button("✨ Reveal Your Character"):
-    # Prepare input data for the model
     input_data = np.array(answers).reshape(1, -1)
-    
-    # Make prediction using the loaded model
     prediction = model.predict(input_data)
-    
-    # Inverse transform the numerical prediction back to the character name
     character = le.inverse_transform(prediction)[0]
 
-    # Get the background and text colors for the predicted character
     colors = color_map.get(character, {"bg": DEFAULT_BACKGROUND_COLOR, "text": DEFAULT_TEXT_COLOR})
-    
-    # Dynamically set the background and text color based on the predicted character
     set_background_color(colors["bg"], colors["text"])
     
-    # Display the prediction result
     st.subheader(f"🎉 You are most like **{character}**!")
 
-    # Get the correctly formatted image URL for the predicted character
     image_url = get_image_url(character)
     
-    # --- FIX FOR IMAGE DISPLAY ---
-    # Using st.markdown() with an <img> tag for direct browser loading.
-    # Added onerror to show a placeholder if the image fails to load from the URL.
+    # --- IMAGE DISPLAY WITH ENHANCED FALLBACK AND STYLING ---
+    # The `onerror` now sets the image source to a placeholder if the original URL fails.
+    # The alt text is made more prominent in case of failure.
     st.markdown(
         f"""
         <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="{image_url}" alt="{character}" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
-                 onerror="this.onerror=null;this.src='[https://placehold.co/300x300/cccccc/ffffff?text=Image+Not+Found](https://placehold.co/300x300/cccccc/ffffff?text=Image+Not+Found)';">
+            <img src="{image_url}" 
+                 alt="Image for {character} not found" 
+                 style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+                        background-color: #f0f0f0; padding: 10px; border: 1px solid #ddd;"
+                 onerror="this.onerror=null; this.src='[https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing)'; this.style.fontSize='1.2em'; this.style.textAlign='center';">
         </div>
         <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
         """,
-        unsafe_allow_html=True # Crucial for rendering HTML tags
+        unsafe_allow_html=True
     )
-
