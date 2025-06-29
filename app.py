@@ -92,9 +92,13 @@ def download_image(character_name):
     image_filename = f"{character_name.replace(' ', '_').lower()}.png"
     remote_image_url = GITHUB_IMAGES_BASE_URL + image_filename
 
-    # Create a directory to store downloaded images if it doesn't exist
-    # Use Streamlit's temporary cache directory or a subfolder within it
-    download_dir = Path(st.runtime.get_instance().script_run_ctx.session_id) / "downloaded_images"
+    # --- FIX for AttributeError: Using a stable, relative path for cached downloads ---
+    # Get the directory where the current script (app.py) is located
+    current_script_dir = Path(__file__).parent
+    # Define a subfolder within the script's directory for downloaded images
+    download_dir = current_script_dir / "temp_downloaded_images"
+    
+    # Create the directory if it doesn't exist
     download_dir.mkdir(parents=True, exist_ok=True)
     local_image_path = download_dir / image_filename
 
@@ -169,8 +173,8 @@ if st.button("✨ Reveal Your Character"):
         st.image(local_image_path, caption=character, use_container_width=True)
     else:
         # Fallback if download fails (e.g., show a placeholder or message)
-        st.warning(f"Could not load image for {character}.")
-        # Optionally, you can still show the placeholder HTML for more control
+        st.warning(f"Could not load image for {character}. Displaying placeholder.")
+        # Show placeholder HTML for more control
         st.markdown(
             f"""
             <div style="display: flex; justify-content: center; margin-bottom: 10px;">
