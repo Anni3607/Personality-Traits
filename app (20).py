@@ -1,8 +1,7 @@
 import streamlit as st
 import joblib
 import numpy as np
-# PIL.Image is not directly used by st.image, so it's removed to clean up imports.
-# import os # Not needed for image handling with GitHub Pages
+# Removed 'from PIL import Image' as it's not used in this final version.
 
 # --- Model and Label Encoder Loading ---
 # Ensure 'character_predictor.pkl' and 'label_encoder.pkl' are in the same directory
@@ -168,35 +167,45 @@ for idx, q_data in enumerate(questions_and_choices):
     # Using specific options for each question for better user experience
     answer = st.selectbox(f"**{q_data['question']}**", q_data['options'], key=idx)
     # Convert the selected option back to numerical value (1, 2, or 3)
+    # The index is 0-based, so add 1 to get 1, 2, or 3.
     answers.append(q_data['options'].index(answer) + 1)
 
 # Button to trigger character prediction
 if st.button("✨ Reveal Your Character"):
+    # Ensure all questions are answered before proceeding
     if len(answers) != len(questions_and_choices):
         st.error("Please answer all questions before revealing your character.")
     else:
+        # Prepare input data for the model prediction
         input_data = np.array(answers).reshape(1, -1)
         
         try:
+            # Make prediction using the loaded model
             prediction = model.predict(input_data)
+            # Inverse transform the numerical prediction back to the character name
             character = le.inverse_transform(prediction)[0]
         except Exception as e:
-            st.error(f"Prediction Error: Could not predict character. Please check model integrity. Error: {e}")
-            st.stop()
+            st.error(f"Prediction Error: Could not predict character. "
+                     "Please check if your model ('character_predictor.pkl') "
+                     f"and label encoder ('label_encoder.pkl') are valid. Error details: {e}")
+            # Optionally, you might want to st.stop() here in a real app,
+            # but for debugging, letting it continue might show other issues.
 
         # Get specific background and text colors for the predicted character
+        # Fallback to default colors if character not found in color_map
         colors = color_map.get(character, {"bg": DEFAULT_BACKGROUND_COLOR, "text": DEFAULT_TEXT_COLOR})
         set_background_color(colors["bg"], colors["text"])
         
+        # Display the prediction result
         st.subheader(f"🎉 You are most like **{character}**!")
 
-        # Get the image URL using the function defined above (GitHub Pages or Imgur/Cloudinary)
+        # Get the image URL using the function defined above (GitHub Pages)
         image_url = get_image_url(character)
         
         # --- IMAGE DISPLAY ---
-        # Using st.markdown() with an <img> tag for direct browser loading.
-        # This bypasses Streamlit's internal media handling which caused previous errors.
-        # The onerror attribute provides a robust fallback if the image URL itself fails.
+        # Using st.markdown() with an <img> HTML tag for direct browser loading.
+        # This method is robust as it bypasses Streamlit's internal media handling.
+        # The 'onerror' attribute provides a client-side fallback if the image URL fails to load.
         st.markdown(
             f"""
             <div style="display: flex; justify-content: center; margin-bottom: 10px;">
