@@ -64,10 +64,10 @@ color_map = {
     "Chandler Bing": {"bg": "#E8F8F5", "text": "black"}
 }
 
-
+# --- Image Handling: Using Direct GitHub URLs (NOT Base64) ---
 # Base URL for the raw images on GitHub
 # IMPORTANT: Double-check your GitHub username, repository name, and branch name here!
-GITHUB_IMAGES_BASE_URL = "https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/"
+GITHUB_IMAGES_BASE_URL = "[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/)"
 
 # Function to generate the correct raw GitHub image URL
 # It expects image files to be lowercase with underscores and .png extension.
@@ -75,6 +75,7 @@ def get_image_url(character):
     image_filename = f"{character.replace(' ', '_').lower()}.png"
     return GITHUB_IMAGES_BASE_URL + image_filename
 
+# --- End of Image Handling Section ---
 
 
 questions = [
@@ -85,14 +86,14 @@ questions = [
     "🪞 On a scale of 1 to 3, how emotional and expressive are you?",
     "🧑‍🤝‍🧑 On a scale of 1 to 3, how much of a leader are you in group settings?",
     "🔪 On a scale of 1 to 3, how intensely do you react to betrayal?",
-    "⚖ On a scale of 1 to 3, how much do you value logic over emotions in life?",
+    "⚖️ On a scale of 1 to 3, how much do you value logic over emotions in life?",
     "🐶 On a scale of 1 to 3, how affectionate and attached are you to animals or pets?",
     "👗 On a scale of 1 to 3, how stylish and expressive is your dressing style?",
-    "🛠 On a scale of 1 to 3, how much do you prefer hands-on, practical work over theoretical?",
-    "🗣 On a scale of 1 to 3, how much do people find you socially funny or talkative?",
+    "🛠️ On a scale of 1 to 3, how much do you prefer hands-on, practical work over theoretical?",
+    "🗣️ On a scale of 1 to 3, how much do people find you socially funny or talkative?",
     "💔 On a scale of 1 to 3, how deeply do you hold grudges when someone hurts you?",
     "🫶 On a scale of 1 to 3, how much do you admire honesty and kindness in others?",
-    "✈ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?"
+    "✈️ On a scale of 1 to 3, how much do you crave a peaceful, scenic vacation over a luxurious one?"
 ]
 
 options = ["1", "2", "3"]
@@ -107,7 +108,7 @@ st.write("Be honest :)")
 
 answers = []
 for idx, question in enumerate(questions):
-    answer = st.selectbox(f"{question}", options, key=idx)
+    answer = st.selectbox(f"**{question}**", options, key=idx)
     answers.append(int(answer))
 
 if st.button("✨ Reveal Your Character"):
@@ -118,46 +119,24 @@ if st.button("✨ Reveal Your Character"):
     colors = color_map.get(character, {"bg": DEFAULT_BACKGROUND_COLOR, "text": DEFAULT_TEXT_COLOR})
     set_background_color(colors["bg"], colors["text"])
     
-    st.subheader(f"🎉 You are most like *{character}*!")
+    st.subheader(f"🎉 You are most like **{character}**!")
 
-    # --- DIAGNOSTIC PRINT ---
-    st.info(f"Predicted character from model: '{character}'")
+    # Get the image URL using the function defined above
+    image_url = get_image_url(character)
     
-    # Get the base64 image data for the predicted character
-    image_data_url = BASE64_IMAGES.get(character) # Use .get() to avoid KeyError directly
+    # --- IMAGE DISPLAY ---
+    # Using st.markdown() with an <img> tag for direct browser loading.
+    # Added onerror to show a placeholder if the image fails to load from the URL.
+    st.markdown(
+        f"""
+        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+            <img src="{image_url}" 
+                 alt="Image for {character} not found" 
+                 style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+                 onerror="this.onerror=null;this.src='[https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing)';">
+        </div>
+        <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
+        """,
+        unsafe_allow_html=True
+    )
 
-    # --- NEW DIAGNOSTIC PRINT for Base64 String ---
-    if image_data_url:
-        st.info(f"Base64 string for '{character}' starts with: '{image_data_url[:50]}...'") # Print first 50 chars
-    else:
-        st.warning(f"No Base64 data found in dictionary for '{character}'.")
-
-
-    if image_data_url and image_data_url.startswith("data:image/png;base64,"): # Basic sanity check
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                <img src="{image_data_url}" 
-                     alt="Image for {character}" 
-                     style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
-            </div>
-            <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
-            """,
-            unsafe_allow_html=True
-        )
-    else:
-        # Fallback if character's base64 data is not found OR if it's malformed
-        st.error(f"Image data for '{character}' is missing or malforAmed. "
-                 "Please ensure the BASE64_IMAGES dictionary is correctly copied and contains valid Base64 for this character.")
-        st.markdown(
-            f"""
-            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-                <img src="[https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing)" 
-                     alt="Image missing" 
-                     style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
-                            background-color: #f0f0f0; padding: 10px; border: 1px solid #ddd;">
-            </div>
-            <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
-            """,
-            unsafe_allow_html=True
-        )
