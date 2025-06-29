@@ -68,6 +68,7 @@ st.title("🧠 Which Famous Character Are You?")
 st.write("Answer the questions below and find out which iconic character you're most like!")
 st.write(" 1 means you are GREAT at it, 2 means you are AVERAGE at it and 3 means you are poor at it!")
 st.write("Be honest :)")
+st.write("ALL THE BEST !!")
 
 answers = []
 for idx, question in enumerate(questions):
