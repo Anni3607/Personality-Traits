@@ -15,57 +15,76 @@ except FileNotFoundError as e:
              "are in the correct path on your deployment server.")
     st.stop() # Stop the app execution if essential files are missing
 
-# Set Streamlit page configuration (must be called once at the top)
+# Set Streamlit page configuration (must be called once at the top of the script)
 st.set_page_config(page_title="Which Famous Character Are You?", layout="centered")
 
-# Define a default background color for the app's initial state
-# This will be applied before any prediction is made.
-DEFAULT_BACKGROUND_COLOR = "#E0F7FA" # A pleasant light blue/cyan shade
+# --- Background Color Management ---
+# Define a default background color for the app's initial state.
+# This color is chosen to be clearly non-white and provide good contrast for questions.
+DEFAULT_BACKGROUND_COLOR = "#2c3e50" # Dark slate grey/charcoal
+DEFAULT_TEXT_COLOR = "white" # Text color for default dark background
 
 # Function to set dynamic background color for the whole app
-def set_background_color(hex_color):
+def set_background_color(hex_color, text_color):
     st.markdown(
         f"""
         <style>
         .stApp {{
             background-color: {hex_color};
-            color: black; /* Keep text color black for readability against varying backgrounds */
+            color: {text_color}; /* Set text color based on background for readability */
+        }}
+        /* Ensure specific elements like headers and bold text also inherit or have good contrast */
+        h1, h2, h3, h4, h5, h6, strong {{
+            color: {text_color};
+        }}
+        /* For the selectbox labels which are bold markdown */
+        .stSelectbox label p strong {{
+            color: {text_color};
+        }}
+        /* Text inputs and other elements might need specific styling if they don't inherit well */
+        div[data-testid="stTextInput"] > label > div > p,
+        div[data-testid="stTextarea"] > label > div > p {{
+            color: {text_color};
+        }}
+        /* General paragraph text */
+        .stMarkdown p {{
+            color: {text_color};
         }}
         </style>
         """,
         unsafe_allow_html=True # Required to inject custom HTML/CSS
     )
 
-# Dictionary mapping characters to their specific background colors
-# These colors will be applied after a character is predicted.
+# Dictionary mapping characters to their specific background colors.
+# Most of these are light, so we'll set their text color to black.
 color_map = {
-    "Walter White": "#F4D03F",  # Yellowish
-    "Michael Scott": "#D6EAF8", # Light Blue
-    "Nezuko": "#F9EBEA",      # Light Pink/Beige
-    "Sheldon Cooper": "#E8DAEF", # Light Purple
-    "Johan Liebert": "#FADBD8",  # Light Peach
-    "Moira Rose": "#FCF3CF",    # Creamy Yellow
-    "Phil Dunphy": "#D1F2EB",    # Light Teal
-    "Cameron Tucker": "#FADBD8", # Light Peach
-    "Ron Swanson": "#FDEDEC",    # Light Red/Orange
-    "Sherlock Holmes": "#EAECEE",# Light Grey
-    "Batman": "#D5DBDB",       # Grey
-    "Peter Griffin": "#F6DDCC",  # Light Orange
-    "Daenerys": "#EBDEF0",     # Lavender
-    "Andy Dwyer": "#FEF9E7",    # Pale Yellow
-    "Jethalal Gada": "#FCF3CF", # Creamy Yellow
-    "Chandler Bing": "#E8F8F5"  # Mint Green
+    "Walter White": {"bg": "#F4D03F", "text": "black"},  # Yellowish
+    "Michael Scott": {"bg": "#D6EAF8", "text": "black"}, # Light Blue
+    "Nezuko": {"bg": "#F9EBEA", "text": "black"},      # Light Pink/Beige
+    "Sheldon Cooper": {"bg": "#E8DAEF", "text": "black"}, # Light Purple
+    "Johan Liebert": {"bg": "#FADBD8", "text": "black"},  # Light Peach
+    "Moira Rose": {"bg": "#FCF3CF", "text": "black"},    # Creamy Yellow
+    "Phil Dunphy": {"bg": "#D1F2EB", "text": "black"},    # Light Teal
+    "Cameron Tucker": {"bg": "#FADBD8", "text": "black"}, # Light Peach
+    "Ron Swanson": {"bg": "#FDEDEC", "text": "black"},    # Light Red/Orange
+    "Sherlock Holmes": {"bg": "#EAECEE", "text": "black"},# Light Grey
+    "Batman": {"bg": "#D5DBDB", "text": "black"},       # Grey
+    "Peter Griffin": {"bg": "#F6DDCC", "text": "black"},  # Light Orange
+    "Daenerys": {"bg": "#EBDEF0", "text": "black"},     # Lavender
+    "Andy Dwyer": {"bg": "#FEF9E7", "text": "black"},    # Pale Yellow
+    "Jethalal Gada": {"bg": "#FCF3CF", "text": "black"}, # Creamy Yellow
+    "Chandler Bing": {"bg": "#E8F8F5", "text": "black"}  # Mint Green
 }
 
 # Function to generate the correct raw GitHub image URL
 # This is crucial for images hosted on GitHub to display correctly in deployed apps.
-# It points to the raw content, not the GitHub web page view.
-def get_image_path(character):
+def get_image_url(character):
     # Ensure the character name matches the image file naming convention.
     # e.g., "Walter White" -> "walter_white.jpg"
     image_filename = f"{character.replace(' ', '_').lower()}.jpg"
     # IMPORTANT: Verify 'Anni3607', 'Personality-Traits', and 'main'
     # match your exact GitHub username, repository name, and branch name.
+    # Also, ensure images are indeed .jpg. If you have .png, modify this.
     return f"[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/){image_filename}"
 
 # Define the questions for the personality quiz
@@ -92,8 +111,8 @@ options = ["1", "2", "3"]
 
 # --- Streamlit UI Layout ---
 
-# Apply the initial default background color when the app first loads
-set_background_color(DEFAULT_BACKGROUND_COLOR)
+# Apply the initial default background and text color when the app first loads
+set_background_color(DEFAULT_BACKGROUND_COLOR, DEFAULT_TEXT_COLOR)
 
 st.title("🧠 Which Famous Character Are You?")
 st.write("Answer the questions below and find out which iconic character you're most like!")
@@ -117,31 +136,29 @@ if st.button("✨ Reveal Your Character"):
     # Inverse transform the numerical prediction back to the character name
     character = le.inverse_transform(prediction)[0]
 
-    # Dynamically set the background color based on the predicted character
-    # If a character is not in the color_map, it will default to DEFAULT_BACKGROUND_COLOR
-    set_background_color(color_map.get(character, DEFAULT_BACKGROUND_COLOR))
+    # Get the background and text colors for the predicted character
+    colors = color_map.get(character, {"bg": DEFAULT_BACKGROUND_COLOR, "text": DEFAULT_TEXT_COLOR})
+    
+    # Dynamically set the background and text color based on the predicted character
+    set_background_color(colors["bg"], colors["text"])
     
     # Display the prediction result
     st.subheader(f"🎉 You are most like **{character}**!")
 
     # Get the correctly formatted image URL for the predicted character
-    image_url = get_image_path(character)
+    image_url = get_image_url(character)
     
-    # --- IMPORTANT FIX FOR IMAGE DISPLAY ---
-    # Instead of st.image(), we use st.markdown() with an <img> tag.
-    # This directly embeds the image URL into the HTML, bypassing Streamlit's
-    # internal media file manager which seems to be causing the error by
-    # attempting to read the URL as a local file.
+    # --- FIX FOR IMAGE DISPLAY ---
+    # Using st.markdown() with an <img> tag for direct browser loading.
+    # Added onerror to show a placeholder if the image fails to load from the URL.
     st.markdown(
         f"""
         <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="{image_url}" alt="{character}" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);">
+            <img src="{image_url}" alt="{character}" style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2);"
+                 onerror="this.onerror=null;this.src='[https://placehold.co/300x300/cccccc/ffffff?text=Image+Not+Found](https://placehold.co/300x300/cccccc/ffffff?text=Image+Not+Found)';">
         </div>
         <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
         """,
         unsafe_allow_html=True # Crucial for rendering HTML tags
     )
-
-    # Optional: Add a check if the image URL is valid (can be complex to do reliably client-side)
-    # For now, relying on the correct URL generation and GitHub's reliability.
 
