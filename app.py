@@ -1,7 +1,9 @@
 import streamlit as st
 import joblib
 import numpy as np
-# from PIL import Image # PIL (Pillow) is not directly used for st.image, so it can be commented out if not needed elsewhere
+import os
+import requests # Used for downloading images
+from pathlib import Path # For better path manipulation
 
 # Load the trained model and label encoder
 # IMPORTANT: Ensure these files ('character_predictor.pkl', 'label_encoder.pkl')
@@ -76,12 +78,40 @@ color_map = {
     "Chandler Bing": {"bg": "#E8F8F5", "text": "black"}  # Mint Green
 }
 
-# Function to generate the correct raw GitHub image URL
-# It expects image files to be lowercase with underscores and .png extension.
-def get_image_url(character):
-    image_filename = f"{character.replace(' ', '_').lower()}.png"
-    # Double-check this path on your GitHub repo (username, repo, branch, folder name)
-    return f"[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/){image_filename}"
+# Base URL for the raw images on GitHub
+GITHUB_IMAGES_BASE_URL = "[https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/](https://raw.githubusercontent.com/Anni3607/Personality-Traits/main/images/)"
+
+# Cache the downloaded images locally to avoid re-downloading on every run
+@st.cache_resource
+def download_image(character_name):
+    """
+    Downloads an image from GitHub to a local temporary directory
+    and returns its local path.
+    """
+    # Construct the image filename based on character name and .png extension
+    image_filename = f"{character_name.replace(' ', '_').lower()}.png"
+    remote_image_url = GITHUB_IMAGES_BASE_URL + image_filename
+
+    # Create a directory to store downloaded images if it doesn't exist
+    # Use Streamlit's temporary cache directory or a subfolder within it
+    download_dir = Path(st.runtime.get_instance().script_run_ctx.session_id) / "downloaded_images"
+    download_dir.mkdir(parents=True, exist_ok=True)
+    local_image_path = download_dir / image_filename
+
+    if not local_image_path.exists():
+        try:
+            st.info(f"Downloading image for {character_name}...") # Informative message
+            response = requests.get(remote_image_url, stream=True)
+            response.raise_for_status() # Raise HTTPError for bad responses (4xx or 5xx)
+
+            with open(local_image_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            st.success(f"Successfully downloaded {image_filename}!")
+        except requests.exceptions.RequestException as e:
+            st.error(f"Failed to download image for {character_name} from {remote_image_url}: {e}")
+            return None # Return None if download fails
+    return str(local_image_path) # Return the string path
 
 # Define the questions for the personality quiz
 questions = [
@@ -131,21 +161,26 @@ if st.button("✨ Reveal Your Character"):
     
     st.subheader(f"🎉 You are most like **{character}**!")
 
-    image_url = get_image_url(character)
+    # Attempt to download the image locally
+    local_image_path = download_image(character)
     
-    # --- IMAGE DISPLAY WITH ENHANCED FALLBACK AND STYLING ---
-    # The `onerror` now sets the image source to a placeholder if the original URL fails.
-    # The alt text is made more prominent in case of failure.
-    st.markdown(
-        f"""
-        <div style="display: flex; justify-content: center; margin-bottom: 10px;">
-            <img src="{image_url}" 
-                 alt="Image for {character} not found" 
-                 style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
-                        background-color: #f0f0f0; padding: 10px; border: 1px solid #ddd;"
-                 onerror="this.onerror=null; this.src='[https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing)'; this.style.fontSize='1.2em'; this.style.textAlign='center';">
-        </div>
-        <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
-        """,
-        unsafe_allow_html=True
-    )
+    if local_image_path:
+        # Use st.image() with the local path
+        st.image(local_image_path, caption=character, use_container_width=True)
+    else:
+        # Fallback if download fails (e.g., show a placeholder or message)
+        st.warning(f"Could not load image for {character}.")
+        # Optionally, you can still show the placeholder HTML for more control
+        st.markdown(
+            f"""
+            <div style="display: flex; justify-content: center; margin-bottom: 10px;">
+                <img src="[https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing](https://placehold.co/300x300/cccccc/ffffff?text=Image+Missing)" 
+                     alt="Image for {character} not found" 
+                     style="max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+                            background-color: #f0f0f0; padding: 10px; border: 1px solid #ddd;">
+            </div>
+            <p style="text-align: center; font-size: 1.2em; font-weight: bold;">{character}</p>
+            """,
+            unsafe_allow_html=True
+        )
+
