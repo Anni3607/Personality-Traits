@@ -1,7 +1,6 @@
 import streamlit as st
 import joblib
 import numpy as np
-# Removed 'from PIL import Image' as it's not used in this final version.
 
 # --- Model and Label Encoder Loading ---
 # Ensure 'character_predictor.pkl' and 'label_encoder.pkl' are in the same directory
@@ -74,8 +73,9 @@ color_map = {
 
 # --- Image Handling with GitHub Pages ---
 # This is the most reliable way to serve images directly from your GitHub repo.
-# YOU MUST SET UP GITHUB PAGES FOR YOUR REPOSITORY.
+# YOU MUST HAVE SET UP GITHUB PAGES FOR YOUR REPOSITORY (as verified in the last step).
 # Base URL for images served via GitHub Pages.
+# IMPORTANT: This line is now UNCOMMENTED AND ACTIVE.
 # Replace 'Anni3607' with your GitHub username and 'Personality-Traits' with your repository name.
 # Ensure your 'images' folder is directly in the root of your 'main' branch on GitHub.
 GITHUB_PAGES_BASE_URL = "[https://annni3607.github.io/Personality-Traits/images/](https://annni3607.github.io/Personality-Traits/images/)"
